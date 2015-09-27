@@ -6,7 +6,11 @@ organization := "com.github.krishnateja262"
 
 scalaVersion := "2.11.7"
 
-publishMavenStyle := true
+enablePlugins(JavaAppPackaging)
+
+packageDescription in Debian := "ElasticSearchIndexer"
+
+maintainer in Debian := "Krishna"
 
 libraryDependencies += "com.sksamuel.elastic4s" %% "elastic4s-core" % "1.6.0"
 
