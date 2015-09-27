@@ -22,15 +22,17 @@ object Test extends App{
   val client = ElasticClient.remote(settings,("",9300))
   val tubeListenFunctions = TubeListenFunctions(14711,"")
 
+  val tubeName = "productDetailsTube"
+
   while(true){
-    if(tubeListenFunctions.getTubeStatus("productDetailsTube") > 0){
-      val updates = tubeStringToBulkOperation("productDetailsTube")
+    if(tubeListenFunctions.getTubeStatus(tubeName) > 0){
+      val updates = tubeStringToBulkOperation(tubeName)
       if(updates.length > 0) {
         executeElasticBulkUpdate(updates)
       }
     }else{
       logger.log(Level.INFO,"Sleeping....")
-      Thread.sleep(600000)
+      tubeListenFunctions.reserveOneString(tubeName)
     }
   }
 

@@ -28,4 +28,10 @@ class TubeListenFunctions(port:Int,host:String){
       k.replaceAll("\\\\","")
     }
   }
+
+  def reserveOneString(tubeName:String): String ={
+    clientImpl.watch(tubeName)
+    val job = clientImpl.reserve(null)
+    new String(job.getData)
+  }
 }
