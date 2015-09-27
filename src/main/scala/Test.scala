@@ -1,4 +1,6 @@
-import com.sksamuel.elastic4s.ElasticClient
+import java.util.logging.{Level, Logger}
+
+import com.sksamuel.elastic4s.{UpdateDefinition, ElasticClient}
 import org.elasticsearch.common.settings.ImmutableSettings
 import org.joda.time.{DateTime, DateTimeZone}
 import org.json.{JSONArray, JSONObject}
@@ -11,21 +13,37 @@ import scala.util.Try
  */
 object Test extends App{
 
+  val logger = Logger.getLogger(this.getClass.getName)
+
   val dateTime = new DateTime(DateTimeZone.forID("Asia/Kolkata"))
 
   val settings = ImmutableSettings.settingsBuilder().put("cluster.name", "elasticsearch").build()
 
-  val client = ElasticClient.remote(settings,("",9300))
-  val tubeListenFunctions = TubeListenFunctions(14711,"")
+  val client = ElasticClient.remote(settings,("128.199.195.255",9300))
+  val tubeListenFunctions = TubeListenFunctions(14711,"128.199.150.107")
 
-  while(tubeListenFunctions.getTubeStatus("productDetailsTube")>0) {
-    client.execute {
-      bulk(
-        tubeStringToBulkOperation("productDetailsTube")
-      )
-    }.await
+  while(true){
+    if(tubeListenFunctions.getTubeStatus("productDetailsTube")>100){
+      val updates = tubeStringToBulkOperation("productDetailsTube")
+      if(updates.length > 0) {
+        executeElasticBulkUpdate(updates)
+      }
+    }else{
+      logger.log(Level.INFO,"Sleeping....")
+      Thread.sleep(600000)
+    }
   }
-  println("done!!")
+
+  def executeElasticBulkUpdate(updates:List[UpdateDefinition])={
+    val exec = Try(client.execute {
+      bulk(
+      updates
+      )
+    }.await)
+    if(exec.isFailure){
+      logger.log(Level.SEVERE,exec.failed.get.getMessage)
+    }
+  }
 
   def tubeStringToBulkOperation(tubeName:String)={
     val objs = if(tubeListenFunctions.getTubeStatus(tubeName) > 0) tubeListenFunctions.getTubeMessages(tubeName,100) else List()
@@ -39,7 +57,7 @@ object Test extends App{
 
     for(i <- List.range(0,generatedMapObjects.length)) yield {
       val productId = generatedMapObjects(i)("merchant")+"_"+generatedMapObjects(i)("pid")
-      println(productId)
+      logger.log(Level.INFO,productId)
       update id(productId) in "products/product" docAsUpsert(generatedMapObjects(i))
     }
   }
