@@ -30,10 +30,8 @@ object Test extends App{
       if(updates.length > 0) {
         executeElasticBulkUpdate(updates)
       }
-    }else{
-      logger.log(Level.INFO,"Sleeping....")
-      tubeListenFunctions.reserveOneString(tubeName)
     }
+    Thread.sleep(10000)
   }
 
   def executeElasticBulkUpdate(updates:List[UpdateDefinition])={
