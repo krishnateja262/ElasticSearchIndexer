@@ -15,17 +15,8 @@ object Test extends App{
 
   val settings = ImmutableSettings.settingsBuilder().put("cluster.name", "elasticsearch").build()
 
-  val client = ElasticClient.remote(settings,("128.199.195.255",9300))
-  val tubeListenFunctions = TubeListenFunctions(14711,"128.199.150.107")
-  val k = client.execute{
-    get id "flipkart_TSHE7FCH5YBEJBFM" from "products"
-  }.await
-  println(k.getSource)
-//  while(tubeListenFunctions.getTubeStatus("productDetailsTube") > 0) {
-////    ElasticFunctions.bulkUpsertDocuments(tubeStringToBulkOperation("productDetailsTube")).await
-//    tubeStringToBulkOperation("productDetailsTube")
-//    println("Done inserting 100 docs")
-//  }
+  val client = ElasticClient.remote(settings,("",9300))
+  val tubeListenFunctions = TubeListenFunctions(14711,"")
 
   while(tubeListenFunctions.getTubeStatus("productDetailsTube")>0) {
     client.execute {
