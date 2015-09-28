@@ -67,27 +67,31 @@ object Test extends App{
   }
 
   def generateMap(jSONObject: JSONObject)={
-    Try(Map(
-      "images"->jsonStringArrayToList(jSONObject.getJSONArray("images")),
-      "imgUrl"-> jSONObject.getString("img"),
-      "rating"-> jSONObject.getDouble("rating"),
-      "description"->jSONObject.getString("description"),
-      "discount"->jSONObject.getDouble("discount"),
-      "specifications"->jSONObject.getJSONObject("specifications"),
-      "offerModel"-> jSONObject.getJSONObject("offerModel"),
-      "colors"->jsonStringArrayToList(jSONObject.getJSONArray("colors")),
-      "features"->jsonStringArrayToList(jSONObject.getJSONArray("features")),
-      "sizes"->jsonStringArrayToList(jSONObject.getJSONArray("sizes")),
-      "sellingPrice"->jSONObject.getInt("discountedPrice"),
-      "originalPrice"->jSONObject.getInt("price"),
-      "merchant"->jSONObject.getString("vendor"),
-      "otherFeatures"->jSONObject.getJSONObject("otherFeatures"),
-      "title"->jSONObject.getString("name"),
-      "pid"->jSONObject.getString("id"),
-      "productUrl"->jSONObject.getString("productUrl"),
-      "fashion"->jSONObject.getBoolean("fashion"),
-      "updateAt"-> dateTime.toDateTime.toString
-    )).getOrElse(Map())
+    if(jSONObject.has("name") && jSONObject.has("id") && jSONObject.has("productUrl") && jSONObject.has("img")) {
+      Map(
+        "images" -> Try(jsonStringArrayToList(jSONObject.getJSONArray("images"))).getOrElse(new JSONArray()),
+        "imgUrl" -> jSONObject.getString("img"),
+        "description" -> Try(jSONObject.getString("description")).getOrElse(""),
+        "discount" -> jSONObject.getDouble("discount"),
+        "specifications" -> Try(jSONObject.getJSONObject("specifications")).getOrElse(new JSONObject()),
+        "offerModel" -> Try(jSONObject.getJSONObject("offerModel")).getOrElse(new JSONObject()),
+        "colors" -> Try(jsonStringArrayToList(jSONObject.getJSONArray("colors"))).getOrElse(new JSONArray()),
+        "features" -> Try(jsonStringArrayToList(jSONObject.getJSONArray("features"))).getOrElse(new JSONArray()),
+        "sizes" -> Try(jsonStringArrayToList(jSONObject.getJSONArray("sizes"))).getOrElse(new JSONArray()),
+        "sellingPrice" -> jSONObject.getInt("discountedPrice"),
+        "originalPrice" -> jSONObject.getInt("price"),
+        "merchant" -> jSONObject.getString("vendor"),
+        "otherFeatures" -> Try(jSONObject.getJSONObject("otherFeatures")).getOrElse(new JSONObject()),
+        "title" -> jSONObject.getString("name"),
+        "pid" -> jSONObject.getString("id"),
+        "productUrl" -> jSONObject.getString("productUrl"),
+        "fashion" -> jSONObject.getBoolean("fashion"),
+        "updateAt" -> dateTime.toDateTime.toString
+      )
+    }else{
+      logger.log(Level.SEVERE,jSONObject.toString())
+      Map[String,AnyRef]()
+    }
   }
 
   def jsonStringArrayToList(array:JSONArray)={
