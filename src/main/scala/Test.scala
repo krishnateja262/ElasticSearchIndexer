@@ -97,6 +97,7 @@ object Test extends App{
       logger.log(Level.WARNING,jSONObject.toString())
       Map(
         "pid" -> jSONObject.getString("id"),
+        "merchant" -> jSONObject.getString("vendor"),
         "isProduct" -> false
       )
     }else{
