@@ -86,7 +86,10 @@ object Test extends App{
         "pid" -> jSONObject.getString("id"),
         "productUrl" -> jSONObject.getString("productUrl"),
         "fashion" -> jSONObject.getBoolean("fashion"),
-        "updateAt" -> dateTime.toDateTime.toString
+        "updateAt" -> dateTime.toDateTime.toString,
+        "inStock" -> jSONObject.getBoolean("inStock"),
+        "dates" -> jsonStringArrayToList(Try(jSONObject.getJSONArray("dates")).getOrElse(new JSONArray())),
+        "rating" -> Try(jSONObject.getDouble("rating")).getOrElse(0.0)
       )
     }else{
       logger.log(Level.SEVERE,jSONObject.toString())
