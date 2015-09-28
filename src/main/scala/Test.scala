@@ -67,7 +67,8 @@ object Test extends App{
   }
 
   def generateMap(jSONObject: JSONObject)={
-    if(jSONObject.has("name") && jSONObject.has("id") && jSONObject.has("productUrl") && jSONObject.has("img")) {
+    if(jSONObject.has("name") && jSONObject.has("id") && jSONObject.has("productUrl") && jSONObject.has("img")
+      && jSONObject.has("isProduct") && jSONObject.getBoolean("isProduct")) {
       Map(
         "images" -> jsonStringArrayToList(Try(jSONObject.getJSONArray("images")).getOrElse(new JSONArray())),
         "imgUrl" -> jSONObject.getString("img"),
@@ -89,7 +90,14 @@ object Test extends App{
         "updateAt" -> dateTime.toDateTime.toString,
         "inStock" -> jSONObject.getBoolean("inStock"),
         "dates" -> jsonStringArrayToList(Try(jSONObject.getJSONArray("dates")).getOrElse(new JSONArray())),
-        "rating" -> Try(jSONObject.getDouble("rating")).getOrElse(0.0)
+        "rating" -> Try(jSONObject.getDouble("rating")).getOrElse(0.0),
+        "isProduct" -> true
+      )
+    }else if(jSONObject.has("id") && jSONObject.has("isProduct") && !jSONObject.getBoolean("isProduct")){
+      logger.log(Level.WARNING,jSONObject.toString())
+      Map(
+        "pid" -> jSONObject.getString("id"),
+        "isProduct" -> false
       )
     }else{
       logger.log(Level.SEVERE,jSONObject.toString())
