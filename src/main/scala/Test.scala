@@ -69,15 +69,15 @@ object Test extends App{
   def generateMap(jSONObject: JSONObject)={
     if(jSONObject.has("name") && jSONObject.has("id") && jSONObject.has("productUrl") && jSONObject.has("img")) {
       Map(
-        "images" -> Try(jsonStringArrayToList(jSONObject.getJSONArray("images"))).getOrElse(new JSONArray()),
+        "images" -> jsonStringArrayToList(Try(jSONObject.getJSONArray("images")).getOrElse(new JSONArray())),
         "imgUrl" -> jSONObject.getString("img"),
         "description" -> Try(jSONObject.getString("description")).getOrElse(""),
         "discount" -> jSONObject.getDouble("discount"),
         "specifications" -> Try(jSONObject.getJSONObject("specifications")).getOrElse(new JSONObject()),
         "offerModel" -> Try(jSONObject.getJSONObject("offerModel")).getOrElse(new JSONObject()),
-        "colors" -> Try(jsonStringArrayToList(jSONObject.getJSONArray("colors"))).getOrElse(new JSONArray()),
-        "features" -> Try(jsonStringArrayToList(jSONObject.getJSONArray("features"))).getOrElse(new JSONArray()),
-        "sizes" -> Try(jsonStringArrayToList(jSONObject.getJSONArray("sizes"))).getOrElse(new JSONArray()),
+        "colors" -> jsonStringArrayToList(Try(jSONObject.getJSONArray("colors")).getOrElse(new JSONArray())),
+        "features" -> jsonStringArrayToList(Try(jSONObject.getJSONArray("features")).getOrElse(new JSONArray())),
+        "sizes" -> jsonStringArrayToList(Try(jSONObject.getJSONArray("sizes")).getOrElse(new JSONArray())),
         "sellingPrice" -> jSONObject.getInt("discountedPrice"),
         "originalPrice" -> jSONObject.getInt("price"),
         "merchant" -> jSONObject.getString("vendor"),
