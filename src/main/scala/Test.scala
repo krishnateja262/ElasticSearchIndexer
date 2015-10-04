@@ -1,7 +1,7 @@
 import java.util.logging.{Level, Logger}
 
 import com.sksamuel.elastic4s.ElasticDsl._
-import com.sksamuel.elastic4s.{ElasticsearchClientUri, ElasticClient, UpdateDefinition}
+import com.sksamuel.elastic4s.{ElasticClient, UpdateDefinition}
 import org.elasticsearch.common.settings.ImmutableSettings
 import org.joda.time.{DateTime, DateTimeZone}
 import org.json.{JSONArray, JSONObject}
@@ -20,15 +20,23 @@ object Test extends App{
   val settings = ImmutableSettings.settingsBuilder().put("cluster.name", "elasticsearch")
     .put("discovery.zen.ping.multicast.enabled",false).build()
 
-  val client = ElasticClient.remote(settings, ElasticsearchClientUri("elasticsearch://:9300"))
-  val tubeListenFunctions = TubeListenFunctions(14711,"")
+  val client = ElasticClient.remote(settings, ("128.199.195.255",9300))
+  val tubeListenFunctions = TubeListenFunctions(14711,"128.199.150.107")
+//  val settings = ImmutableSettings.settingsBuilder()
+//    .put("http.enabled", "false")
+//    .put("transport.tcp.port", "9300-9400")
+//    .put("discovery.zen.ping.multicast.enabled", "false")
+//    .put("discovery.zen.ping.unicast.hosts", "128.199.195.255").build()
+//
+//  val node = nodeBuilder().client(true).settings(settings).clusterName("elasticsearch").node()
+//  val client = ElasticClient.fromNode(node)
 
   val tubeName = "productDetailsTube"
 
-//  val k = client.execute{
-//    count from "products"->"product"
-//  }.await
-//  println(k.getCount+"**************")
+  val k = client.execute{
+    count from "products"->"product"
+  }.await
+  println(k.getCount+"**************")
 
   while(true){
     if(tubeListenFunctions.getTubeStatus(tubeName) > 0){
