@@ -1,10 +1,10 @@
 import java.util.logging.{Level, Logger}
 
-import com.sksamuel.elastic4s.{UpdateDefinition, ElasticClient}
+import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.{ElasticsearchClientUri, ElasticClient, UpdateDefinition}
 import org.elasticsearch.common.settings.ImmutableSettings
 import org.joda.time.{DateTime, DateTimeZone}
 import org.json.{JSONArray, JSONObject}
-import com.sksamuel.elastic4s.ElasticDsl._
 
 import scala.util.Try
 
@@ -17,12 +17,18 @@ object Test extends App{
 
   val dateTime = new DateTime(DateTimeZone.forID("Asia/Kolkata"))
 
-  val settings = ImmutableSettings.settingsBuilder().put("cluster.name", "elasticsearch").build()
+  val settings = ImmutableSettings.settingsBuilder().put("cluster.name", "elasticsearch")
+    .put("discovery.zen.ping.multicast.enabled",false).build()
 
-  val client = ElasticClient.remote(settings,("",9300))
+  val client = ElasticClient.remote(settings, ElasticsearchClientUri("elasticsearch://:9300"))
   val tubeListenFunctions = TubeListenFunctions(14711,"")
 
   val tubeName = "productDetailsTube"
+
+//  val k = client.execute{
+//    count from "products"->"product"
+//  }.await
+//  println(k.getCount+"**************")
 
   while(true){
     if(tubeListenFunctions.getTubeStatus(tubeName) > 0){
@@ -31,7 +37,8 @@ object Test extends App{
         executeElasticBulkUpdate(updates)
       }
     }
-    Thread.sleep(10000)
+//    Thread.sleep(10000)
+    System.exit(0)
   }
 
   def executeElasticBulkUpdate(updates:List[UpdateDefinition])={
@@ -41,12 +48,13 @@ object Test extends App{
       )
     }.await)
     if(exec.isFailure){
+      println(exec.get.buildFailureMessage())
       logger.log(Level.SEVERE,exec.failed.get.getMessage)
     }
   }
 
   def tubeStringToBulkOperation(tubeName:String)={
-    val objs = if(tubeListenFunctions.getTubeStatus(tubeName) > 0) tubeListenFunctions.getTubeMessages(tubeName,100) else List()
+    val objs = if(tubeListenFunctions.getTubeStatus(tubeName) > 0) tubeListenFunctions.getTubeMessages(tubeName,2) else List()
 
     val generatedJsonObjects = objs.map(obj => {
       val jsonObj = Try(new JSONObject(obj))
