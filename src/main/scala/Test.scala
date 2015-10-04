@@ -1,7 +1,7 @@
 import java.util.logging.{Level, Logger}
 
 import com.sksamuel.elastic4s.ElasticDsl._
-import com.sksamuel.elastic4s.{ElasticClient, UpdateDefinition}
+import com.sksamuel.elastic4s.{ElasticClient, ElasticsearchClientUri, UpdateDefinition}
 import org.elasticsearch.common.settings.ImmutableSettings
 import org.joda.time.{DateTime, DateTimeZone}
 import org.json.{JSONArray, JSONObject}
@@ -18,9 +18,9 @@ object Test extends App{
   val dateTime = new DateTime(DateTimeZone.forID("Asia/Kolkata"))
 
   val settings = ImmutableSettings.settingsBuilder().put("cluster.name", "elasticsearch")
-    .put("discovery.zen.ping.multicast.enabled",false).build()
+    .put("discovery.zen.ping.multicast.enabled",false).put("discovery.zen.ping.unicast.hosts", "localhost").build()
 
-  val client = ElasticClient.remote(settings, ("128.199.195.255",9300))
+  val client = ElasticClient.remote(settings, ElasticsearchClientUri("elasticsearch://128.199.195.255:9300"))
   val tubeListenFunctions = TubeListenFunctions(14711,"128.199.150.107")
 //  val settings = ImmutableSettings.settingsBuilder()
 //    .put("http.enabled", "false")
