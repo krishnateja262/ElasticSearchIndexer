@@ -17,26 +17,12 @@ object Test extends App{
 
   val dateTime = new DateTime(DateTimeZone.forID("Asia/Kolkata"))
 
-  val settings = ImmutableSettings.settingsBuilder().put("cluster.name", "elasticsearch")
-    .put("discovery.zen.ping.multicast.enabled",false).put("discovery.zen.ping.unicast.hosts", "localhost").build()
+  val settings = ImmutableSettings.settingsBuilder().put("cluster.name", "elasticsearch").build()
 
-  val client = ElasticClient.remote(settings, ElasticsearchClientUri("elasticsearch://128.199.195.255:9300"))
-  val tubeListenFunctions = TubeListenFunctions(14711,"128.199.150.107")
-//  val settings = ImmutableSettings.settingsBuilder()
-//    .put("http.enabled", "false")
-//    .put("transport.tcp.port", "9300-9400")
-//    .put("discovery.zen.ping.multicast.enabled", "false")
-//    .put("discovery.zen.ping.unicast.hosts", "128.199.195.255").build()
-//
-//  val node = nodeBuilder().client(true).settings(settings).clusterName("elasticsearch").node()
-//  val client = ElasticClient.fromNode(node)
+  val client = ElasticClient.remote(settings, ElasticsearchClientUri("elasticsearch://:9300"))
+  val tubeListenFunctions = TubeListenFunctions(14711,"")
 
   val tubeName = "productDetailsTube"
-
-  val k = client.execute{
-    count from "products"->"product"
-  }.await
-  println(k.getCount+"**************")
 
   while(true){
     if(tubeListenFunctions.getTubeStatus(tubeName) > 0){
@@ -45,8 +31,7 @@ object Test extends App{
         executeElasticBulkUpdate(updates)
       }
     }
-//    Thread.sleep(10000)
-    System.exit(0)
+    Thread.sleep(10000)
   }
 
   def executeElasticBulkUpdate(updates:List[UpdateDefinition])={
